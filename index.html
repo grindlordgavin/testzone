@@ -1,0 +1,36 @@
+<button id="start">Enable motion</button>
+<pre id="out"></pre>
+
+<script>
+const out = document.getElementById('out');
+
+function startListening() {
+  // Orientation (alpha/beta/gamma in degrees)
+  window.addEventListener('deviceorientation', (e) => {
+    out.textContent =
+      `alpha (z): ${e.alpha?.toFixed(1)}\n` +
+      `beta  (x): ${e.beta?.toFixed(1)}\n` +
+      `gamma (y): ${e.gamma?.toFixed(1)}`;
+  });
+
+  // Raw rotation rate (the actual gyroscope data, deg/s)
+  window.addEventListener('devicemotion', (e) => {
+    const r = e.rotationRate;
+    if (r) console.log(r.alpha, r.beta, r.gamma);
+  });
+}
+
+document.getElementById('start').addEventListener('click', async () => {
+  // iOS 13+ requires an explicit permission request
+  if (typeof DeviceOrientationEvent !== 'undefined' &&
+      typeof DeviceOrientationEvent.requestPermission === 'function') {
+    try {
+      const res = await DeviceOrientationEvent.requestPermission();
+      if (res !== 'granted') return alert('Permission denied');
+    } catch (err) {
+      return alert('Permission error: ' + err);
+    }
+  }
+  startListening();
+});
+</script>
